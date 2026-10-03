@@ -1,0 +1,32 @@
+# CoTailr
+
+> CoTailr (cotailr.com) is an AI resume and cover-letter tailoring app. Paste a job description or job link and it builds a tailored resume, cover letter and combined application pack in about a minute, using only content from the user's own profile, rendered as ATS-safe PDFs. It also scores job fit, tracks applications and drafts screening-question answers. AI assistants (Claude, Cursor, VS Code, Claude Code, any MCP client) can use CoTailr through the CoTailr connector at https://mcp.cotailr.com/mcp.
+
+Key facts:
+
+- Made by NexNimbus LLP, Bangalore, India. Contact: connect@nexnimbus.com.
+- Per-line control: Locked (never changed), Preferred (may be reworded), Flexible (swapped in only if a better match), CoTailr AI (filled from the user's profile and the job).
+- Outputs: resume PDF, cover letter PDF, combined pack. Template families: Tech Style (Snapshot 1 page, Professional 2, Portfolio 3–4, Dossier 5+), ATS Classic, Minimal, Coral.
+- Plans: 7-day Pro trial with 25 credits (no card). Free: 1.5 credits/day, ATS Classic, resume PDF. Plus: $9.99/month (₹499 in India), 100 credits/month. Pro: $19.99/month (₹999 in India), 175 credits/month.
+- Credits: tailored pack 1, organise resume 1, job fit 0.5, application answers 0.3, tone sample 0.2, cover-letter section 0.2, Brief organise 0.1. Reading, editing and tracking are free.
+- Sign up: https://cotailr.com/login?mode=signup
+- Connector: create an access key at https://cotailr.com/settings#connected-apps, then connect with the header `Authorization: Bearer <key>`. Connected apps can spend up to 15 credits per day. Every change is undoable.
+
+## Docs
+
+- [What is CoTailr?](https://raw.githubusercontent.com/cotailr/cotailr-skill/main/docs/what-is-cotailr.md): full product guide covering features, templates, plans, credits and privacy
+- [Connector tools reference](https://raw.githubusercontent.com/cotailr/cotailr-skill/main/docs/connector-tools.md): all 42 MCP tools, access levels, costs and errors
+- [FAQ](https://raw.githubusercontent.com/cotailr/cotailr-skill/main/docs/faq.md)
+- [Setup guide (README)](https://raw.githubusercontent.com/cotailr/cotailr-skill/main/README.md): connect Claude, Claude Code, Cursor, VS Code or any MCP app
+
+## Skill
+
+- [CoTailr skill (SKILL.md)](https://raw.githubusercontent.com/cotailr/cotailr-skill/main/skills/cotailr/SKILL.md): how an AI assistant should use CoTailr (job-link workflow, tailoring, tracker, forms, follow-ups, profile upkeep)
+
+## Optional
+
+- [Pricing](https://cotailr.com/pricing/)
+- [FAQ on cotailr.com](https://cotailr.com/faq/)
+- [Blog](https://cotailr.com/blog/)
+- [Privacy Policy](https://cotailr.com/privacy/)
+- [Terms](https://cotailr.com/terms/)

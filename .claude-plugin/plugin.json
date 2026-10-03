@@ -1,0 +1,8 @@
+{
+  "name": "cotailr",
+  "version": "1.0.0",
+  "description": "CoTailr job-search assistant: tailored resumes and cover letters, job tracker, fit scores and application answers, from your CoTailr profile.",
+  "author": { "name": "CoTailr", "url": "https://cotailr.com" },
+  "homepage": "https://cotailr.com",
+  "keywords": ["resume", "cover-letter", "job-search", "mcp", "career"]
+}

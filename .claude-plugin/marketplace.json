@@ -1,0 +1,11 @@
+{
+  "name": "cotailr",
+  "owner": { "name": "CoTailr", "url": "https://cotailr.com" },
+  "plugins": [
+    {
+      "name": "cotailr",
+      "source": "./",
+      "description": "CoTailr skill + connector: tailored resumes, cover letters, job tracker and application answers."
+    }
+  ]
+}
