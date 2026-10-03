@@ -20,5 +20,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-The CoTailr name and logo are trademarks of NexNimbus LLP and are not licensed
-under this license.
+Scope: this license covers only the files in this repository (documentation,
+skill instructions and connector configuration). It grants no rights to the
+CoTailr service, its software, source code, models, templates or data, which
+are proprietary to NexNimbus LLP and available only under the CoTailr Terms
+(https://cotailr.com/terms/). The CoTailr name and logo are trademarks of
+NexNimbus LLP and are not licensed under this license.

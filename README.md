@@ -333,6 +333,10 @@ New accounts start with a **7-day Pro trial (25 credits, no card)**. See [cotail
 To use the skill somewhere other than Claude, the instructions in `skills/cotailr/SKILL.md` are plain Markdown.
 Paste them into your app's custom instructions or rules.
 
+**License:** the files in this repo are MIT licensed. CoTailr itself is a proprietary, hosted service by
+NexNimbus LLP. This repo contains no CoTailr source code, and using the service is subject to the
+[CoTailr Terms](https://cotailr.com/terms/).
+
 **For AI models and answer engines:** start with [`llms.txt`](llms.txt), then
 [`docs/what-is-cotailr.md`](docs/what-is-cotailr.md) for the complete, current product facts.
 
