@@ -141,7 +141,7 @@ This repo is a Claude Code plugin marketplace. Installing the plugin adds both t
 #      export COTAILR_API_KEY="<your-key>"
 
 # 2. In Claude Code
-/plugin marketplace add cotailr/cotailr-skill
+/plugin marketplace add NexNimbus/cotailr-skill
 /plugin install cotailr@cotailr
 ```
 
