@@ -25,7 +25,7 @@ profile*.
 | Tool | Access | Credits | What it does |
 |---|---|---|---|
 | `fetch_job(job_url)` | G | Free | Reads a job posting: company, role, location and a text preview. |
-| `generate_resume(job_url \| job_text, template?, size?, special_instructions?, company?, role?)` | G | 1 | Starts a tailored resume and cover letter pack. `size`: auto, snapshot, professional, portfolio, dossier. Returns `job_id`. The finished pack is added to the tracker as *Ready to apply*. |
+| `generate_resume(job_url \| job_text, template?, size?, special_instructions?, company?, role?, tone?)` | G | 1 | Starts a tailored resume and cover letter pack. `size`: auto, snapshot, professional, portfolio, dossier. `tone`: AI Tone for this pack only (pass `match.tone_fit.suggested.tone` from `match_job` to use the suggestion; omit for the user's own tone). Returns `job_id`. The finished pack is added to the tracker as *Ready to apply*. |
 | `get_generation(job_id)` | G | Free | Status. When done, gives download links (valid for 10 minutes) and the tracker `application_id`. |
 | `list_templates()` | G | Free | Template families available to the user, and which are active. |
 | `get_usage()` | G | Free | Credits left, plan, and today's connected-app spend against the daily cap. |
@@ -63,6 +63,7 @@ profile*.
 | `add_brief_chunk(title, body, kind?)` / `update_brief(chunk_id, ...)` / `remove_brief_chunk(chunk_id)` | Full | Free | Manage Brief notes. |
 | `organise_brief(notes)` | Full | 0.1 | Turns freeform notes into Brief notes. |
 | `get_tone()` / `update_tone(fields)` | Full | Free | Tone settings. |
+| `update_cover_letter(section, text?, url?, link_text?, enabled?)` | Full | Free | Writes your own wording into the profile cover letter: `opening`, `differentiator` or `closing` (`{{COMPANY}}` becomes the employer's name). Read the current text with `get_components('cover_letter')`. Undo with `undo_last_change('components')`. |
 | `add_tone_sample(axes?)` | Full | 0.2 | A two-paragraph sample in the user's voice. |
 
 ## Templates
@@ -78,7 +79,7 @@ profile*.
 
 | Tool | Access | Credits | What it does |
 |---|---|---|---|
-| `match_job(job_text \| job_url, company?, role?)` | Full | 0.5 | Job Fit score before applying. |
+| `match_job(job_text \| job_url, company?, role?)` | Full | 0.5 | Job Fit score before applying, plus `tone_fit`: the user's AI Tone scored for this job (strong, partial or weak) and, when clearly better, a suggested tone with the changed settings and reasons. |
 | `rematch_application(application_id, job_text?, force?)` | Full | 0.5 | Scores a tracked application. Free if it's already scored. |
 | `answer_application_questions(questions \| text, job_text? \| application_id?, length?, guidance?)` | Full | 0.3 | Drafts screening-question answers from the profile. |
 | `generate_cover_letter(section, current?, save?)` | Full | 0.2 | Drafts a cover-letter block: opening, differentiator, closing or achievements. |
