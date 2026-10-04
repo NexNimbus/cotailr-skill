@@ -72,8 +72,13 @@ If the posting is blocked (`job_url_blocked`), ask the user to paste the job tex
    and tone.
 3. Poll `get_generation` every ~30 seconds until done (usually 1-3 minutes). Share the links; they
    expire after 10 minutes, so call `get_generation` again for fresh ones.
-4. The pack is tracked as "Ready to apply" (status `draft`). Ask the user to tell you once they've
-   submitted, then `update_application(status="applied")`.
+4. The pack is tracked as "Ready to apply" (status `draft`). For Ashby jobs (`jobs.ashbyhq.com`)
+   on a desktop browser, suggest **Apply with CoTailr**: the button in CoTailr's Tracker or Generate
+   page opens the form and the CoTailr Fill bookmark fills it (resume, cover letter, screening
+   answers; 0.3 credits). The user reviews and submits, and CoTailr marks the job applied when
+   Ashby confirms. You can't run it from the chat.
+5. When the user says they've submitted, check `get_application` first; Apply with CoTailr may have
+   marked it already. Otherwise `update_application(status="applied")`.
 
 Each generation adds a tracker entry. Don't call `create_application` for it. If the user generated
 twice for the same job, offer to delete the older entry.
@@ -85,6 +90,8 @@ twice for the same job, offer to delete the older entry.
   suggest a number inside the Brief's range.
 - Written questions: `answer_application_questions` with `application_id` (if tracked) or
   `job_text`, so answers fit the job. Present them for the user to edit.
+- Ashby forms: Apply with CoTailr fills the whole form in the user's browser (see above), which
+  is usually easier than copying answers one by one.
 
 ## Tracker review
 
