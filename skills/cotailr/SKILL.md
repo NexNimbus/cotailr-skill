@@ -137,4 +137,11 @@ interview_3, offer, got_the_job, rejected_no_interview, rejected (after some pro
 - Default bullet style for every pack: `update_tone(fields={"bullets": "xyz"})` (or `car`, `ao`,
   `auto`, `off`). `match_job`'s `tone_fit` may suggest one for a specific job. After component edits, `sync_master_from_components` (preview free) keeps
   the master in step.
+- Cover letter: `update_cover_letter` writes the user's own opening, differentiator or closing.
+  Paragraphs set to Preferred are tuned to each job from saved facts only. The sign-off line
+  ("Best regards," and so on) is `update_cover_letter(section="closing", signoff=...)`.
+- Template colours set with `set_colors` apply to that template's resume and cover letter.
+- Logic rules (name prefix, photo, location framing, headline tag, layout density, keyed to the
+  job's region, work mode, employment type or seniority) are edited in CoTailr's Logic page; there
+  is no connector tool for them yet.
 - Contact changes need `update_contact` twice: preview, then `confirm=true` after the user agrees.

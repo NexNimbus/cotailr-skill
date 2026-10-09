@@ -43,9 +43,12 @@ Every line of your resume and cover letter carries a mode you set once:
 | Mode | What CoTailr may do |
 |---|---|
 | **Locked** | Prints exactly as written. Never reworded, never dropped. |
-| **Preferred** | May be lightly reworded, never replaced. |
+| **Preferred** | May be lightly reworded, never replaced. Always prints before Flexible lines in the same job. |
 | **Flexible** | Swapped in only when it matches the job better than what's already there. |
 | **CoTailr AI** | An open slot CoTailr fills from the job and your master resume. |
+
+When a bullet is rewritten, CoTailr checks it against your original. If the rewrite adds a number, tool or
+claim, or drops one, the original wording prints instead.
 
 ### Built from your facts
 
@@ -71,8 +74,16 @@ prompts.
 ### Generate
 - Paste a job description (up to 20,000 characters) or fetch it from a URL.
 - Choose a template family and size, or let **Auto** pick the size from how much of the job your profile covers.
-- Add a short special instruction if you want something emphasised.
+- Add a short special instruction if you want something emphasised. If you ask for something a setting does
+  better (hiding your date of birth, a bullet style), a note points you to it as you type.
+- **Hide on this resume:** leave date of birth, gender, nationality, location, onsite preference or phone off
+  one pack without changing your profile.
+- **Bullet style:** CoTailr Style (default), Auto, XYZ, CAR or Action + outcome, per job or as your default.
+  Rewritten bullets you like can be saved to your profile in one click.
+- **Check before sending:** a short list of anything worth a second look. It never blocks the download.
 - Preview, edit the generated document in place (re-saving re-renders the PDF at no extra cost) and download.
+- Cover letters tune Preferred paragraphs to the job from your saved facts, use one or two headline figures, and
+  end with the sign-off you choose.
 
 ### Job link reading
 Dedicated support for Workday, Greenhouse, Lever, Ashby, SmartRecruiters, Workable, Recruitee, Personio, BambooHR,
@@ -97,11 +108,12 @@ Brief, Fit also checks the job against your salary band, seniority, relocation a
 | Family | Style | Sizes |
 |---|---|---|
 | **Tech Style** | Modern, visual | Snapshot (1 page), Professional (2), Portfolio (3–4), Dossier (5+) |
-| **ATS Classic** | Single-column, parser-first | Professional (2 pages) |
+| **ATS Classic** | Single-column, parser-first | Professional (1–3 pages; spacing adapts to your content) |
 | **Minimal** | Clean single-column | Professional |
 | **Coral** | Two-column | Professional |
 
-Some templates let you change colours and reorder sections.
+Some templates let you change colours and reorder sections; colours apply to the cover letter too. Each template
+card says what it's best for, when to choose another, and how ATS-friendly it is.
 
 ### AI Tone
 Set the voice for your summary and cover letter:
@@ -111,7 +123,8 @@ Set the voice for your summary and cover letter:
 - **Language:** British, American, Neutral international
 - **Personality:** Balanced, Collaborative, Individual-first, Mentor, Operator
 
-Every setting also has a Custom option, and you can generate a live sample to hear the voice.
+Every setting also has a Custom option, and you can generate a live sample to hear the voice. **Experience
+bullets** sets your default bullet style.
 
 ### Answers (application questions)
 Drafts answers to screening questions from your profile:
@@ -126,9 +139,11 @@ Your private memory: target roles, salary expectations, notice period, relocatio
 want told. Write it messily and CoTailr organises it into notes. The Brief steers Fit, Answers and tailoring, and
 is never printed on your documents.
 
-### Logic (regional presentation rules)
-IF / AND / OR rules for regional conventions (name prefixes, photos, location formats), keyed to the job's region:
-Middle East, India, Asia Pacific, Europe, United States and United Kingdom.
+### Logic (presentation rules)
+IF / AND / OR / NOT rules for how your resume is presented, keyed to the job's region (Middle East, India,
+Asia Pacific, Europe, United States, United Kingdom), work mode, employment type, seniority, company, role or
+keywords. Rules can set name prefixes, photos, location formats, a short headline tag and layout density. A live
+preview explains which rules matched. Logic never changes your facts.
 
 ### Tracker
 Every generation is tracked automatically with company, role, fit and ATS scores and the documents you sent.

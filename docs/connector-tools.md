@@ -26,7 +26,7 @@ profile*.
 |---|---|---|---|
 | `fetch_job(job_url)` | G | Free | Reads a job posting: company, role, location and a text preview. |
 | `generate_resume(job_url \| job_text, template?, size?, special_instructions?, company?, role?, tone?, hide_fields?)` | G | 1 | Starts a tailored resume and cover letter pack. `size`: auto, snapshot, professional, portfolio, dossier. `tone`: AI Tone for this pack only (pass `match.tone_fit.suggested.tone` from `match_job` to use the suggestion; omit for the user's own tone). `tone.bullets` sets the experience bullet style for this pack: `off` (CoTailr Style), `auto`, `xyz`, `car` or `ao`. `hide_fields`: personal details to leave off this pack only, any of `dob`, `gender`, `nationality`, `location`, `onsite`, `phone` (the profile is not changed). Returns `job_id` and `warnings` for instructions CoTailr can't follow (each says which option does it). The finished pack is added to the tracker as *Ready to apply*. |
-| `get_generation(job_id)` | G | Free | Status. When done, gives download links (valid for 10 minutes) and the tracker `application_id`. Also returns `warnings` (things to check before sending: a hidden detail still printed, a rewritten bullet with a number or tool not in the original, a cut-off line, too many pages) and, when a bullet style was used, `bullet_style` and `bullet_rewrites` (`[{id, source, text}]`). Warnings never block the download. |
+| `get_generation(job_id)` | G | Free | Status. When done, gives download links (valid for 10 minutes) and the tracker `application_id`. Also returns `warnings` (things to check before sending: a hidden detail still printed, a rewrite that kept the original wording because it added or dropped a fact, a cut-off line, too many pages, a section dropped to fit) and, when a bullet style was used, `bullet_style` and `bullet_rewrites` (`[{id, source, text}]`). Warnings never block the download. |
 | `list_templates()` | G | Free | Template families available to the user, and which are active. Each family has a `tagline`, `best_for`, `avoid_if`, `ats_friendliness` (high or medium) with `ats_note`, `layout` (columns, photo, look) and `sizes` (what each size contains). Use it to recommend a template for the job. |
 | `get_usage()` | G | Free | Credits left, plan, and today's connected-app spend against the daily cap. |
 
@@ -64,7 +64,7 @@ profile*.
 | `add_brief_chunk(title, body, kind?)` / `update_brief(chunk_id, ...)` / `remove_brief_chunk(chunk_id)` | Full | Free | Manage Brief notes. |
 | `organise_brief(notes)` | Full | 0.1 | Turns freeform notes into Brief notes. |
 | `get_tone()` / `update_tone(fields)` | Full | Free | Tone settings: seniority, style, authority, language, personality, and `bullets` (experience bullet style: `off` = CoTailr Style, `auto`, `xyz`, `car`, `ao`). |
-| `update_cover_letter(section, text?, url?, link_text?, enabled?)` | Full | Free | Writes your own wording into the profile cover letter: `opening`, `differentiator` or `closing` (`{{COMPANY}}` becomes the employer's name). Read the current text with `get_components('cover_letter')`. Undo with `undo_last_change('components')`. |
+| `update_cover_letter(section, text?, url?, link_text?, enabled?, signoff?)` | Full | Free | Writes your own wording into the profile cover letter: `opening`, `differentiator` or `closing` (`{{COMPANY}}` becomes the employer's name). `signoff` (closing only, up to 60 characters) sets the line above the signature; empty means "Warm Regards,". Paragraphs set to Preferred are tuned to each job from saved facts only. Read the current text with `get_components('cover_letter')`. Undo with `undo_last_change('components')`. |
 | `add_tone_sample(axes?)` | Full | 0.2 | A two-paragraph sample in the user's voice. |
 
 ## Templates
@@ -73,7 +73,7 @@ profile*.
 |---|---|---|---|
 | `get_template_settings(template, template_id)` | Full | Free | Colours and section order. |
 | `activate_template_family(template, enabled)` | Full | Free | Turns a family on or off. |
-| `set_colors(template, template_id, values)` | Full | Free | Sets colours (hex). |
+| `set_colors(template, template_id, values)` | Full | Free | Sets colours (hex). They apply to that template's resume and cover letter. |
 | `set_section_order(template, template_id, order)` | Full | Free | Sets section order. |
 
 ## AI writing and scoring
