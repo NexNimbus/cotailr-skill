@@ -15,7 +15,7 @@ Key facts:
 ## Docs
 
 - [What is CoTailr?](https://raw.githubusercontent.com/NexNimbus/cotailr-skill/main/docs/what-is-cotailr.md): full product guide covering features, templates, plans, credits and privacy
-- [Connector tools reference](https://raw.githubusercontent.com/NexNimbus/cotailr-skill/main/docs/connector-tools.md): all 42 MCP tools, access levels, costs and errors
+- [Connector tools reference](https://raw.githubusercontent.com/NexNimbus/cotailr-skill/main/docs/connector-tools.md): all 44 MCP tools, access levels, costs and errors
 - [FAQ](https://raw.githubusercontent.com/NexNimbus/cotailr-skill/main/docs/faq.md)
 - [Setup guide (README)](https://raw.githubusercontent.com/NexNimbus/cotailr-skill/main/README.md): connect Claude, Claude Code, Cursor, VS Code or any MCP app
 

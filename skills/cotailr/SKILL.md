@@ -65,13 +65,27 @@ If the posting is blocked (`job_url_blocked`), ask the user to paste the job tex
 
 ## Generating a tailored pack
 
-1. Confirm template (`list_templates`; offer the user's active ones) and size (`auto` unless they
-   want snapshot, professional, portfolio or dossier). Ask once, briefly.
-2. `generate_resume`. Only pass `special_instructions` for something the profile can't know, in one
-   sentence (for example "lead with the Salesforce migration"). CoTailr already applies the Brief
-   and tone.
+1. Confirm template and size. Ask once, briefly.
+   - Template: `list_templates` and offer the user's active ones. Recommend one in a line using its
+     `best_for`, `avoid_if` and `ats_friendliness`: `high` for online portals (Workday, Greenhouse,
+     Taleo) and conservative employers, a design-led one when a person reads it first.
+   - Size: `auto` unless they want snapshot, professional, portfolio or dossier.
+2. `generate_resume`. Use the real options, not `special_instructions`, for what they cover:
+   - Leaving a personal detail off this resume (date of birth, gender, nationality, location,
+     onsite preference, phone): `hide_fields`. The profile stays unchanged.
+   - Bullet structure ("XYZ", "CAR", "STAR", "shorter bullets"): `tone={"bullets": ...}` with `xyz`,
+     `car`, `ao` (short action + outcome) or `auto`. `off` is CoTailr Style, the default light
+     tailoring. Bullet styles only reshape Preferred and Flexible bullets from their own facts;
+     Locked bullets never change.
+   - Only pass `special_instructions` for something the profile can't know, in one sentence (for
+     example "lead with the Salesforce migration"). CoTailr already applies the Brief and tone.
+   If `generate_resume` returns `warnings`, tell the user and use the option each one names.
 3. Poll `get_generation` every ~30 seconds until done (usually 1-3 minutes). Share the links; they
    expire after 10 minutes, so call `get_generation` again for fresh ones.
+   - Always relay `warnings` as a short "check before sending" list. They don't block the download.
+   - If there are `bullet_rewrites`, show two or three of the best (original, then new) and offer
+     to keep any as the profile wording with `save_bullet_rewrite`. Save only the ones the user
+     picks.
 4. The pack is tracked as "Ready to apply" (status `draft`). For Ashby jobs (`jobs.ashbyhq.com`)
    on a desktop browser, suggest **Apply with CoTailr**: the button in CoTailr's Tracker or Generate
    page opens the form and the CoTailr Fill bookmark fills it (resume, cover letter, screening
@@ -118,7 +132,9 @@ interview_3, offer, got_the_job, rejected_no_interview, rejected (after some pro
 - New facts from the conversation (a new achievement, changed salary expectation, new target city):
   offer to save them. Short notes go in with `add_brief_chunk` (free); messy notes through
   `organise_brief` (0.1).
-- Fix resume content with `update_component_item`, `replace_role_bullets` or
-  `update_master_section`. After component edits, `sync_master_from_components` (preview free) keeps
+- Fix resume content with `update_component_item`, `replace_role_bullets`, `save_bullet_rewrite` or
+  `update_master_section`.
+- Default bullet style for every pack: `update_tone(fields={"bullets": "xyz"})` (or `car`, `ao`,
+  `auto`, `off`). `match_job`'s `tone_fit` may suggest one for a specific job. After component edits, `sync_master_from_components` (preview free) keeps
   the master in step.
 - Contact changes need `update_contact` twice: preview, then `confirm=true` after the user agrees.

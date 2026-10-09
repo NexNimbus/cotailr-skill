@@ -5,7 +5,7 @@ The CoTailr connector is a remote [Model Context Protocol](https://modelcontextp
 - **URL:** `https://mcp.cotailr.com/mcp` (Streamable HTTP, stateless, JSON responses)
 - **Auth:** `Authorization: Bearer <access key>` (or `X-API-Key: <access key>`). Keys come from
   [Settings → Connected apps](https://cotailr.com/settings#connected-apps).
-- **Access levels:** **Generate only** keys see the 7 tools marked **G**. **Full access** keys see all 42.
+- **Access levels:** **Generate only** keys see the 7 tools marked **G**. **Full access** keys see all 44.
 - **Credits:** charged tools use the account's normal CoTailr credits. Connected apps can spend at most
   **15 credits per day** (resets 00:00 UTC). Plan features still apply, so Job Fit needs Plus or Pro.
 - **Undo:** every write is snapshotted. `undo_last_change(area)` restores the previous state, and the CoTailr web
@@ -25,9 +25,9 @@ profile*.
 | Tool | Access | Credits | What it does |
 |---|---|---|---|
 | `fetch_job(job_url)` | G | Free | Reads a job posting: company, role, location and a text preview. |
-| `generate_resume(job_url \| job_text, template?, size?, special_instructions?, company?, role?, tone?)` | G | 1 | Starts a tailored resume and cover letter pack. `size`: auto, snapshot, professional, portfolio, dossier. `tone`: AI Tone for this pack only (pass `match.tone_fit.suggested.tone` from `match_job` to use the suggestion; omit for the user's own tone). Returns `job_id`. The finished pack is added to the tracker as *Ready to apply*. |
-| `get_generation(job_id)` | G | Free | Status. When done, gives download links (valid for 10 minutes) and the tracker `application_id`. |
-| `list_templates()` | G | Free | Template families available to the user, and which are active. |
+| `generate_resume(job_url \| job_text, template?, size?, special_instructions?, company?, role?, tone?, hide_fields?)` | G | 1 | Starts a tailored resume and cover letter pack. `size`: auto, snapshot, professional, portfolio, dossier. `tone`: AI Tone for this pack only (pass `match.tone_fit.suggested.tone` from `match_job` to use the suggestion; omit for the user's own tone). `tone.bullets` sets the experience bullet style for this pack: `off` (CoTailr Style), `auto`, `xyz`, `car` or `ao`. `hide_fields`: personal details to leave off this pack only, any of `dob`, `gender`, `nationality`, `location`, `onsite`, `phone` (the profile is not changed). Returns `job_id` and `warnings` for instructions CoTailr can't follow (each says which option does it). The finished pack is added to the tracker as *Ready to apply*. |
+| `get_generation(job_id)` | G | Free | Status. When done, gives download links (valid for 10 minutes) and the tracker `application_id`. Also returns `warnings` (things to check before sending: a hidden detail still printed, a rewritten bullet with a number or tool not in the original, a cut-off line, too many pages) and, when a bullet style was used, `bullet_style` and `bullet_rewrites` (`[{id, source, text}]`). Warnings never block the download. |
+| `list_templates()` | G | Free | Template families available to the user, and which are active. Each family has a `tagline`, `best_for`, `avoid_if`, `ats_friendliness` (high or medium) with `ats_note`, `layout` (columns, photo, look) and `sizes` (what each size contains). Use it to recommend a template for the job. |
 | `get_usage()` | G | Free | Credits left, plan, and today's connected-app spend against the daily cap. |
 
 ## Tracker
@@ -58,11 +58,12 @@ profile*.
 | `remove_component_item(section, item_id, parent_id?)` | Full | Free | Removes an item. |
 | `reorder_items(section, ordered_ids, ...)` | Full | Free | Reorders a list. |
 | `replace_role_bullets(role_id, section_id, bullets)` | Full | Free | Rewrites the bullets of one role. |
+| `save_bullet_rewrite(bullet_id, text)` | Full | Free | Saves one rewritten bullet from `get_generation`'s `bullet_rewrites` as that bullet's profile wording. Locked bullets are refused. Undo with `undo_last_change('components')`. |
 | `get_contact()` / `update_contact(fields, confirm?)` | Full | Free | Contact details. Updating returns a preview and saves on `confirm=true`. |
 | `get_brief()` | Full | Free | The Brief: targets, locations, salary, preferences, stories. |
 | `add_brief_chunk(title, body, kind?)` / `update_brief(chunk_id, ...)` / `remove_brief_chunk(chunk_id)` | Full | Free | Manage Brief notes. |
 | `organise_brief(notes)` | Full | 0.1 | Turns freeform notes into Brief notes. |
-| `get_tone()` / `update_tone(fields)` | Full | Free | Tone settings. |
+| `get_tone()` / `update_tone(fields)` | Full | Free | Tone settings: seniority, style, authority, language, personality, and `bullets` (experience bullet style: `off` = CoTailr Style, `auto`, `xyz`, `car`, `ao`). |
 | `update_cover_letter(section, text?, url?, link_text?, enabled?)` | Full | Free | Writes your own wording into the profile cover letter: `opening`, `differentiator` or `closing` (`{{COMPANY}}` becomes the employer's name). Read the current text with `get_components('cover_letter')`. Undo with `undo_last_change('components')`. |
 | `add_tone_sample(axes?)` | Full | 0.2 | A two-paragraph sample in the user's voice. |
 
@@ -79,7 +80,7 @@ profile*.
 
 | Tool | Access | Credits | What it does |
 |---|---|---|---|
-| `match_job(job_text \| job_url, company?, role?)` | Full | 0.5 | Job Fit score before applying, plus `tone_fit`: the user's AI Tone scored for this job (strong, partial or weak) and, when clearly better, a suggested tone with the changed settings and reasons. |
+| `match_job(job_text \| job_url, company?, role?)` | Full | 0.5 | Job Fit score before applying, plus `tone_fit`: the user's AI Tone scored for this job (strong, partial or weak) and, when clearly better, a suggested tone with the changed settings and reasons. The suggestion can include a bullet style (for example `xyz` for a metrics-heavy role when the relevant bullets contain numbers). |
 | `rematch_application(application_id, job_text?, force?)` | Full | 0.5 | Scores a tracked application. Free if it's already scored. |
 | `answer_application_questions(questions \| text, job_text? \| application_id?, length?, guidance?)` | Full | 0.3 | Drafts screening-question answers from the profile. |
 | `generate_cover_letter(section, current?, save?)` | Full | 0.2 | Drafts a cover-letter block: opening, differentiator, closing or achievements. |

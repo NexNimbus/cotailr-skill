@@ -137,7 +137,7 @@ Statuses: *Ready to apply*, *Applied*, *In progress*, *Interview (1st, 2nd, 3rd+
 
 ### Connected apps (CoTailr connector)
 Let Claude, Cursor, VS Code or any MCP-compatible AI app use CoTailr for you through an access key created in
-Settings. There are 42 tools across jobs, tracker, profile, templates and AI writing, with a daily credit cap and
+Settings. There are 44 tools across jobs, tracker, profile, templates and AI writing, with a daily credit cap and
 undo for every change. See [the connector tools reference](connector-tools.md).
 
 ---
