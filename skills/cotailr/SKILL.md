@@ -137,7 +137,9 @@ a draft; the public page changes only when they publish.
    then claim it with `update_tailrme_draft(handle=...)`.
 3. Changes (template, sections on or off, order, theme, wording) with `update_tailrme_draft`.
    Private details (date of birth, gender, nationality, phone, address) are off by default; turn
-   one on only when the user asks for it by name.
+   one on only when the user asks for it by name. Extra links from Resume details are off too: add
+   their id to `shown_items`, and rename one for the page with `link_labels`.
+   To compare templates with sample people, point the user to https://cotailr.com/showcase.
 4. Page wording: offer `cook_tailrme` (0.3). It writes from the profile only and saves to the draft.
 5. Publishing makes the page public. Show the content, get a clear yes, then
    `publish_tailrme(confirm=true)`. `unpublish_tailrme` takes it offline and keeps the draft.
