@@ -5,7 +5,7 @@ The CoTailr connector is a remote [Model Context Protocol](https://modelcontextp
 - **URL:** `https://mcp.cotailr.com/mcp` (Streamable HTTP, stateless, JSON responses)
 - **Auth:** `Authorization: Bearer <access key>` (or `X-API-Key: <access key>`). Keys come from
   [Settings → Connected apps](https://cotailr.com/settings#connected-apps).
-- **Access levels:** **Generate only** keys see the 7 tools marked **G**. **Full access** keys see all 44.
+- **Access levels:** **Generate only** keys see the 7 tools marked **G**. **Full access** keys see all 52.
 - **Credits:** charged tools use the account's normal CoTailr credits. Connected apps can spend at most
   **15 credits per day** (resets 00:00 UTC). Plan features still apply, so Job Fit needs Plus or Pro.
 - **Undo:** every write is snapshotted. `undo_last_change(area)` restores the previous state, and the CoTailr web
@@ -76,6 +76,24 @@ profile*.
 | `set_colors(template, template_id, values)` | Full | Free | Sets colours (hex). They apply to that template's resume and cover letter. |
 | `set_section_order(template, template_id, order)` | Full | Free | Sets section order. |
 
+## TailrMe (personal page)
+
+TailrMe turns the profile into a one-page personal site at `cotailr.com/@handle`. Edits go to a draft;
+the public page only changes when the draft is published. Private details (date of birth, gender,
+nationality, phone, street address) are off by default. These tools need TailrMe to be enabled for the
+account (`feature_off` otherwise).
+
+| Tool | Access | Credits | What it does |
+|---|---|---|---|
+| `list_tailrme_templates()` | Full | Free | Page templates with name, description, tags and which sections each supports. |
+| `get_tailrme_page()` | Full | Free | The draft, handle, page URL, status, and whether the draft has changed since the last publish. |
+| `get_tailrme_content()` | Full | Free | What the page would show right now, built from the profile and the draft (hero, about, experience, skills, links and so on). |
+| `check_tailrme_handle(handle)` | Full | Free | Whether an address is valid and free. Lookalikes of a taken handle (case or hyphens only) count as taken. |
+| `update_tailrme_draft(changes?, handle?)` | Full | Free | Edits the draft. `sections`, `contact`, `text`, `theme` and `link_labels` are merged; `template_id`, `order`, `shown_items`, `hidden_items` and `indexable` are replaced. `handle` claims the address. Undo with `undo_last_change('tailrme')`. |
+| `cook_tailrme()` | Full | 0.3 | *Let CoTailr AI cook*: writes the page headline, about text and highlights from the profile. Facts not in the profile are dropped. Saves to the draft only. |
+| `publish_tailrme(confirm?)` | Full | Free | Publishes the draft. Without `confirm=true` it only says where the page will go live and whether search engines can see it; show the user `get_tailrme_content` first. |
+| `unpublish_tailrme()` | Full | Free | Takes the page offline. The draft and handle are kept. |
+
 ## AI writing and scoring
 
 | Tool | Access | Credits | What it does |
@@ -90,4 +108,4 @@ profile*.
 
 | Tool | Access | Credits | What it does |
 |---|---|---|---|
-| `undo_last_change(area, confirm?)` | Full | Free | Reverts the latest connected-app change in `templates`, `tracker`, `components`, `master`, `contact`, `brief`, `tone` or `cover_letter`. Asks for confirmation if the user has edited since. |
+| `undo_last_change(area, confirm?)` | Full | Free | Reverts the latest connected-app change in `templates`, `tracker`, `components`, `master`, `contact`, `brief`, `tone`, `cover_letter` or `tailrme`. Asks for confirmation if the user has edited since. |

@@ -1,6 +1,6 @@
 ---
 name: cotailr
-description: Job-search assistant powered by CoTailr. Use whenever the user shares a job posting or URL, asks about applying, tailoring a resume or cover letter, their job tracker or application status, salary or screening questions, follow-ups, interviews, or their CoTailr profile, Brief or tone. Uses the CoTailr connector (https://mcp.cotailr.com/mcp) and walks the user through setup if it isn't connected.
+description: Job-search assistant powered by CoTailr. Use whenever the user shares a job posting or URL, asks about applying, tailoring a resume or cover letter, their job tracker or application status, salary or screening questions, follow-ups, interviews, their CoTailr profile, Brief or tone, or their TailrMe personal page. Uses the CoTailr connector (https://mcp.cotailr.com/mcp) and walks the user through setup if it isn't connected.
 ---
 
 # CoTailr
@@ -41,7 +41,7 @@ revoke it in Settings > Connected apps and create a new one.
   estimate.
 - Never invent experience, metrics or dates. Ask instead.
 - Ask before spending credits and name the cost: resume pack 1, fit score 0.5, application answers
-  0.3, cover letter section 0.2, tone sample 0.2, Brief organise 0.1. Reads, fetching jobs, tracker
+  0.3, TailrMe cook 0.3, cover letter section 0.2, tone sample 0.2, Brief organise 0.1. Reads, fetching jobs, tracker
   and profile edits are free. Connected apps are capped at 15 credits a day (`get_usage`).
 - Ask before changing or deleting anything. Every change made through the connector can be undone
   with `undo_last_change(area)`.
@@ -126,6 +126,23 @@ interview_3, offer, got_the_job, rejected_no_interview, rejected (after some pro
 - Interview prep: read the application, the job (`fetch_job` on its `jd_url`), the master and the
   Brief's stories; give likely questions with answer outlines drawn from real experience. Offer to
   set the status to the right interview round.
+
+## TailrMe personal page
+
+TailrMe is the user's one-page site at `cotailr.com/@handle`, built from their profile. Edits go to
+a draft; the public page changes only when they publish.
+
+1. `get_tailrme_page` for the status and address, `get_tailrme_content` for what the page shows.
+2. Template: `list_tailrme_templates`, recommend one in a line. Address: `check_tailrme_handle`,
+   then claim it with `update_tailrme_draft(handle=...)`.
+3. Changes (template, sections on or off, order, theme, wording) with `update_tailrme_draft`.
+   Private details (date of birth, gender, nationality, phone, address) are off by default; turn
+   one on only when the user asks for it by name.
+4. Page wording: offer `cook_tailrme` (0.3). It writes from the profile only and saves to the draft.
+5. Publishing makes the page public. Show the content, get a clear yes, then
+   `publish_tailrme(confirm=true)`. `unpublish_tailrme` takes it offline and keeps the draft.
+
+If the tools return `feature_off`, TailrMe isn't enabled for this account yet; say so and stop.
 
 ## Profile upkeep
 

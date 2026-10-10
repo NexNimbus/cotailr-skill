@@ -321,7 +321,7 @@ New accounts start with a **7-day Pro trial (25 credits, no card)**. See [cotail
 ├── llms.txt                      ← summary + index for AI models (llmstxt.org format)
 ├── docs/
 │   ├── what-is-cotailr.md        ← full product guide: features, templates, plans, privacy
-│   ├── connector-tools.md        ← all 44 connector tools, access levels and costs
+│   ├── connector-tools.md        ← all 52 connector tools, access levels and costs
 │   └── faq.md
 ├── skills/cotailr/SKILL.md       ← the CoTailr skill (also published as a .zip on cotailr.com)
 ├── .mcp.json                     ← connector config for the Claude Code plugin

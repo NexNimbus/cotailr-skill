@@ -150,9 +150,15 @@ Every generation is tracked automatically with company, role, fit and ATS scores
 Statuses: *Ready to apply*, *Applied*, *In progress*, *Interview (1st, 2nd, 3rd+ round)*, *Offer*, *Got the job*,
 *Rejected (no interview)*, *Didn't get it*, *Withdrawn*.
 
+### TailrMe (personal page)
+A one-page personal site at `cotailr.com/@yourname`, built from your profile. Pick a template, choose which
+sections show and in what order, and optionally let CoTailr AI write the headline, about text and highlights from
+your own facts. Private details (date of birth, gender, nationality, phone, address) stay off unless you turn
+them on. Changes stay in a draft until you publish, and you can unpublish at any time.
+
 ### Connected apps (CoTailr connector)
 Let Claude, Cursor, VS Code or any MCP-compatible AI app use CoTailr for you through an access key created in
-Settings. There are 44 tools across jobs, tracker, profile, templates and AI writing, with a daily credit cap and
+Settings. There are 52 tools across jobs, tracker, profile, templates, AI writing and the TailrMe page, with a daily credit cap and
 undo for every change. See [the connector tools reference](connector-tools.md).
 
 ---
@@ -186,6 +192,7 @@ pricing is always at [cotailr.com/pricing](https://cotailr.com/pricing/).
 | Job Fit | 0.5 (included when run as part of a pack) |
 | Sync Resume Components into master | 0.5 |
 | Application answers | 0.3 |
+| TailrMe page writing (Let CoTailr AI cook) | 0.3 |
 | Tone sample | 0.2 |
 | Cover-letter section draft | 0.2 |
 | Organise Brief notes | 0.1 |
