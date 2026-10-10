@@ -151,11 +151,12 @@ Statuses: *Ready to apply*, *Applied*, *In progress*, *Interview (1st, 2nd, 3rd+
 *Rejected (no interview)*, *Didn't get it*, *Withdrawn*.
 
 ### TailrMe (personal page)
-A one-page personal site at `cotailr.com/@yourname`, built from your profile. Pick a template, choose which
-sections show and in what order, and optionally let CoTailr AI write the headline, about text and highlights from
-your own facts. Private details (date of birth, gender, nationality, phone, address) stay off unless you turn
-them on. Changes stay in a draft until you publish, and you can unpublish at any time. Try every template with
-sample people at [cotailr.com/showcase](https://cotailr.com/showcase).
+A one-page personal site at `cotailr.com/@yourname`, built from your profile. Several designs are available
+(Editorial, Recruiter Scan and more), with Free / Plus / Pro access depending on the template. Pick a design,
+choose which sections show and in what order, and optionally let CoTailr AI write the headline, about text and
+highlights from your own facts. Private details (date of birth, gender, nationality, phone, address) stay off
+unless you turn them on. Changes stay in a draft until you publish, and you can unpublish at any time. Try every
+template with sample people at [cotailr.com/showcase](https://cotailr.com/showcase).
 
 ### Connected apps (CoTailr connector)
 Let Claude, Cursor, VS Code or any MCP-compatible AI app use CoTailr for you through an access key created in

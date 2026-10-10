@@ -85,7 +85,7 @@ account (`feature_off` otherwise).
 
 | Tool | Access | Credits | What it does |
 |---|---|---|---|
-| `list_tailrme_templates()` | Full | Free | Page templates with name, description, tags and which sections each supports. |
+| `list_tailrme_templates()` | Full | Free | Page templates the account may use. Each row includes name, description, `design_philosophy`, `shows`, `use_when`, `avoid_when`, `best_for`, supported/optional sections, reorder rules, plan tier (`plans` / `plan_label`: Free, Plus or Pro), whether it is offered, and `allowed` for this user's plan. Prefer templates with `allowed: true`; use the guidance fields to recommend one in a line. |
 | `get_tailrme_page()` | Full | Free | The draft, handle, page URL, status, and whether the draft has changed since the last publish. |
 | `get_tailrme_content()` | Full | Free | What the page would show right now, built from the profile and the draft (hero, about, experience, skills, links and so on). |
 | `check_tailrme_handle(handle)` | Full | Free | Whether an address is valid and free. Lookalikes of a taken handle (case or hyphens only) count as taken. |

@@ -133,8 +133,9 @@ TailrMe is the user's one-page site at `cotailr.com/@handle`, built from their p
 a draft; the public page changes only when they publish.
 
 1. `get_tailrme_page` for the status and address, `get_tailrme_content` for what the page shows.
-2. Template: `list_tailrme_templates`, recommend one in a line. Address: `check_tailrme_handle`,
-   then claim it with `update_tailrme_draft(handle=...)`.
+2. Template: `list_tailrme_templates`. Only offer rows with `allowed: true`. Recommend one in a
+   line using `design_philosophy`, `shows`, `use_when` and `avoid_when` (and `best_for` if useful).
+   Address: `check_tailrme_handle`, then claim it with `update_tailrme_draft(handle=...)`.
 3. Changes (template, sections on or off, order, theme, wording) with `update_tailrme_draft`.
    Private details (date of birth, gender, nationality, phone, address) are off by default; turn
    one on only when the user asks for it by name. Extra links from Resume details are off too: add
