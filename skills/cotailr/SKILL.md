@@ -41,7 +41,9 @@ revoke it in Settings > Connected apps and create a new one.
   estimate.
 - Never invent experience, metrics or dates. Ask instead.
 - Ask before spending credits and name the cost: resume pack 1, fit score 0.5, application answers
-  0.3, TailrMe cook 0.3, cover letter section 0.2, tone sample 0.2, Brief organise 0.1. Reads, fetching jobs, tracker
+  0.3, TailrMe cook 0.3, cover letter section 0.2, tone sample 0.2, Brief organise 0.1. `credits_charged: 0`
+  means that call was not billed (unlimited / super-admin); listed costs still apply on normal plans.
+  Reads, fetching jobs, tracker
   and profile edits are free. Connected apps are capped at 15 credits a day (`get_usage`).
 - Ask before changing or deleting anything. Every change made through the connector can be undone
   with `undo_last_change(area)`.
@@ -57,8 +59,9 @@ revoke it in Settings > Connected apps and create a new one.
 
 1. `fetch_job`. Summarise: company, role, location and work mode, seniority, 4-6 key requirements,
    salary if listed. Compare quickly against the Brief (location, salary, role type) and flag clear
-   mismatches.
-2. `list_applications(query=<company>)`. If it's already tracked, say so with its status.
+   mismatches. If `likely_closed` is true, warn that the posting looks removed and do not generate
+   until the user confirms or pastes live `job_text`.
+2. `list_applications(query=<company>)` (compact by default). If it's already tracked, say so with its status.
 3. Stop and offer: fit score (0.5) or tailored resume and cover letter (1). Do nothing else unasked.
 
 If the posting is blocked (`job_url_blocked`), ask the user to paste the job text and use `job_text`.
@@ -83,6 +86,8 @@ If the posting is blocked (`job_url_blocked`), ask the user to paste the job tex
 3. Poll `get_generation` every ~30 seconds until done (usually 1-3 minutes). Share the links; they
    expire after 10 minutes, so call `get_generation` again for fresh ones.
    - Always relay `warnings` as a short "check before sending" list. They don't block the download.
+   - If you cannot open the PDFs, call `get_pack_text(job_id)` (and `artifact="cover"` when needed)
+     and skim the text before telling the user the pack is good.
    - If there are `bullet_rewrites`, show two or three of the best (original, then new) and offer
      to keep any as the profile wording with `save_bullet_rewrite`. Save only the ones the user
      picks.
@@ -151,7 +156,7 @@ If the tools return `feature_off`, TailrMe isn't enabled for this account yet; s
 
 - New facts from the conversation (a new achievement, changed salary expectation, new target city):
   offer to save them. Short notes go in with `add_brief_chunk` (free); messy notes through
-  `organise_brief` (0.1).
+  `organise_brief` (0.1). For salary, always include a currency (USD, INR, GBP, …) before saving.
 - Fix resume content with `update_component_item`, `replace_role_bullets`, `save_bullet_rewrite` or
   `update_master_section`.
 - Default bullet style for every pack: `update_tone(fields={"bullets": "xyz"})` (or `car`, `ao`,

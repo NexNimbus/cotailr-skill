@@ -5,9 +5,11 @@ The CoTailr connector is a remote [Model Context Protocol](https://modelcontextp
 - **URL:** `https://mcp.cotailr.com/mcp` (Streamable HTTP, stateless, JSON responses)
 - **Auth:** `Authorization: Bearer <access key>` (or `X-API-Key: <access key>`). Keys come from
   [Settings → Connected apps](https://cotailr.com/settings#connected-apps).
-- **Access levels:** **Generate only** keys see the 7 tools marked **G**. **Full access** keys see all 52.
+- **Access levels:** **Generate only** keys see the 8 tools marked **G**. **Full access** keys see all 53.
 - **Credits:** charged tools use the account's normal CoTailr credits. Connected apps can spend at most
   **15 credits per day** (resets 00:00 UTC). Plan features still apply, so Job Fit needs Plus or Pro.
+  `credits_charged: 0` means that call was not billed (unlimited / super-admin accounts); listed costs
+  still apply on normal Free / Plus / Pro plans.
 - **Undo:** every write is snapshotted. `undo_last_change(area)` restores the previous state, and the CoTailr web
   app shows a *Changed by &lt;app&gt;* marker with an Undo button.
 - **Errors:** `{"error": code, "message": "...", "retry_with"?: field}`. Codes include `job_url_blocked`,
@@ -24,17 +26,18 @@ profile*.
 
 | Tool | Access | Credits | What it does |
 |---|---|---|---|
-| `fetch_job(job_url)` | G | Free | Reads a job posting: company, role, location and a text preview. |
+| `fetch_job(job_url)` | G | Free | Reads a job posting: company, role, location and a text preview. Sets `likely_closed` when the page looks removed or 404 — warn and do not generate until the user confirms. |
 | `generate_resume(job_url \| job_text, template?, size?, special_instructions?, company?, role?, tone?, hide_fields?)` | G | 1 | Starts a tailored resume and cover letter pack. `size`: auto, snapshot, professional, portfolio, dossier. `tone`: AI Tone for this pack only (pass `match.tone_fit.suggested.tone` from `match_job` to use the suggestion; omit for the user's own tone). `tone.bullets` sets the experience bullet style for this pack: `off` (CoTailr Style), `auto`, `xyz`, `car` or `ao`. `hide_fields`: personal details to leave off this pack only, any of `dob`, `gender`, `nationality`, `location`, `onsite`, `phone` (the profile is not changed). Returns `job_id` and `warnings` for instructions CoTailr can't follow (each says which option does it). The finished pack is added to the tracker as *Ready to apply*. |
 | `get_generation(job_id)` | G | Free | Status. When done, gives download links (valid for 10 minutes) and the tracker `application_id`. Also returns `warnings` (things to check before sending: a hidden detail still printed, a rewrite that kept the original wording because it added or dropped a fact, a cut-off line, too many pages, a section dropped to fit) and, when a bullet style was used, `bullet_style` and `bullet_rewrites` (`[{id, source, text}]`). Warnings never block the download. |
+| `get_pack_text(job_id, artifact?)` | G | Free | Plain text of the finished `resume` (default) or `cover`. Use when PDF links are blocked so you can still verify the pack. |
 | `list_templates()` | G | Free | Template families available to the user, and which are active. Each family has a `tagline`, `best_for`, `avoid_if`, `ats_friendliness` (high or medium) with `ats_note`, `layout` (columns, photo, look) and `sizes` (what each size contains). Use it to recommend a template for the job. |
-| `get_usage()` | G | Free | Credits left, plan, and today's connected-app spend against the daily cap. |
+| `get_usage()` | G | Free | Credits left, plan, and today's connected-app spend against the daily cap. Explains when `credits_charged` can be 0. |
 
 ## Tracker
 
 | Tool | Access | Credits | What it does |
 |---|---|---|---|
-| `list_applications(query?, status?, limit?)` | G | Free | Searches the tracker, newest first (up to 100 rows plus counts by status). |
+| `list_applications(query?, status?, limit?, compact?)` | G | Free | Searches the tracker, newest first (up to 100 rows plus counts by status). `compact` defaults to true (short rows); pass `false` for notes and full location fields. |
 | `get_application(application_id)` | G | Free | One application with fit scores and notes. |
 | `create_application(company, role, ...)` | Full | Free | Adds a job by hand. |
 | `update_application(application_id, fields)` | Full | Free | Changes status, notes, dates, company, role or link. Moving *Ready to apply* to *Applied* sets the applied date to today. |
@@ -61,7 +64,7 @@ profile*.
 | `save_bullet_rewrite(bullet_id, text)` | Full | Free | Saves one rewritten bullet from `get_generation`'s `bullet_rewrites` as that bullet's profile wording. Locked bullets are refused. Undo with `undo_last_change('components')`. |
 | `get_contact()` / `update_contact(fields, confirm?)` | Full | Free | Contact details. Updating returns a preview and saves on `confirm=true`. |
 | `get_brief()` | Full | Free | The Brief: targets, locations, salary, preferences, stories. |
-| `add_brief_chunk(title, body, kind?)` / `update_brief(chunk_id, ...)` / `remove_brief_chunk(chunk_id)` | Full | Free | Manage Brief notes. |
+| `add_brief_chunk(title, body, kind?)` / `update_brief(chunk_id, ...)` / `remove_brief_chunk(chunk_id)` | Full | Free | Manage Brief notes. Salary notes must include a currency (USD, INR, GBP, …). |
 | `organise_brief(notes)` | Full | 0.1 | Turns freeform notes into Brief notes. |
 | `get_tone()` / `update_tone(fields)` | Full | Free | Tone settings: seniority, style, authority, language, personality, and `bullets` (experience bullet style: `off` = CoTailr Style, `auto`, `xyz`, `car`, `ao`). |
 | `update_cover_letter(section, text?, url?, link_text?, enabled?, signoff?)` | Full | Free | Writes your own wording into the profile cover letter: `opening`, `differentiator` or `closing` (`{{COMPANY}}` becomes the employer's name). `signoff` (closing only, up to 60 characters) sets the line above the signature; empty means "Warm Regards,". Paragraphs set to Preferred are tuned to each job from saved facts only. Read the current text with `get_components('cover_letter')`. Undo with `undo_last_change('components')`. |

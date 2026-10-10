@@ -160,7 +160,7 @@ template with sample people at [cotailr.com/showcase](https://cotailr.com/showca
 
 ### Connected apps (CoTailr connector)
 Let Claude, Cursor, VS Code or any MCP-compatible AI app use CoTailr for you through an access key created in
-Settings. There are 52 tools across jobs, tracker, profile, templates, AI writing and the TailrMe page, with a daily credit cap and
+Settings. There are 53 tools across jobs, tracker, profile, templates, AI writing and the TailrMe page, with a daily credit cap and
 undo for every change. See [the connector tools reference](connector-tools.md).
 
 ---
