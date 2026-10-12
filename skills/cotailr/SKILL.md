@@ -6,8 +6,9 @@ description: Job-search assistant powered by CoTailr. Use whenever the user shar
 # CoTailr
 
 CoTailr holds the user's career profile (master resume, Resume Components, contact, tone), their
-Brief (personal notes: target roles, locations, salary, notice period, preferences, stories) and a
-job tracker. The CoTailr connector tools act on it. You are the user's job-search assistant on top.
+Brief (private preferences: target roles, locations, salary, notice period and red lines), a separate
+Context Vault (factual stories, projects and evidence), and a job tracker. The CoTailr connector
+tools act on it. You are the user's job-search assistant on top.
 
 ## First run: no CoTailr tools available
 
@@ -75,12 +76,24 @@ If the posting is blocked (`job_url_blocked`), ask the user to paste the job tex
      family's `accepted_sizes` / `aliases`; unsupported size+template pairs are rejected before
      charging (aliases are stated in warnings, never silent).
    - Size: `auto` unless they want snapshot, professional, portfolio or dossier.
-2. Free preflight (recommended): `prepare_generation` with the same job URL or `job_text`. It returns
-   `preflight_id`, resolved template/size, duplicate Tracker candidates, and warnings. Pass
-   `preflight_id` into `generate_resume`. With pasted text, pass `source_url` so the Tracker keeps
-   the original link. If a similar row already exists, pass `application_id` to regenerate into it,
-   or `create_new=true` only when the user wants a second row.
-3. `generate_resume`. Use the real options, not `special_instructions`, for what they cover:
+2. Ask whether the user has any special instruction for this pack; an explicit “none” is a valid answer.
+   Run the free `prepare_generation` with the same job URL or `job_text` and the final template, size,
+   `special_instructions`, `tone` and `hide_fields` you will use. It returns a versioned Generation Plan,
+   `preflight_id`, resolved variant/order, duplicate Tracker candidates and warnings. With pasted text,
+   pass `source_url` so the Tracker keeps the original link. If a similar row already exists, pass
+   `application_id` to regenerate into it, or `create_new=true` only when the user wants a second row.
+   If the plan's collaboration mode is `advisor`, call `review_generation_plan` once with a structured
+   proposal. For `collaborative`, submit one or two revision-bound proposals up to `max_rounds`. For
+   `agent_lead`, propose the initial evidence, order, tone and message strategy; CoTailr still validates every field.
+   Ask the user any returned questions; questions do not consume the round (resubmit the full
+   proposal without `questions` after answers). Use only accepted `effective_generation_arguments`, then
+   call `confirm_generation_plan` with that reviewed revision. After a review that accepted instructions,
+   use `instructions_source=agent_recommendation_accepted` (not `explicit_none`). Pass the confirmed
+   revision as `plan_revision` to `generate_resume`. Advisor, Collaborative and Agent lead modes require review and confirmation;
+   Standard mode only requires confirmation when this access key's strict toggle is enabled
+   (edit the key in CoTailr → Connected apps; each key has its own permissions).
+3. `generate_resume` with the same bound options and `preflight_id`. Use the real options, not
+   `special_instructions`, for what they cover:
    - Leaving a personal detail off this resume (date of birth, gender, nationality, location,
      relocation, onsite preference, phone): `hide_fields`. The profile stays unchanged.
    - Bullet structure ("XYZ", "CAR", "STAR", "shorter bullets"): `tone={"bullets": ...}` with `xyz`,
@@ -88,6 +101,7 @@ If the posting is blocked (`job_url_blocked`), ask the user to paste the job tex
      tailoring. Bullet styles only reshape Preferred and Flexible bullets from their own facts;
      Locked bullets never change.
    - Optional one-pack overrides: `region_override`, `name_prefix_override` (see `get_logic_rules`).
+   - Advisor one-pack section priority: use only the `section_order` returned by the reviewed plan.
    - Only pass `special_instructions` for something the profile can't know, in one sentence (for
      example "lead with the Salesforce migration"). CoTailr already applies the Brief and tone.
    If `generate_resume` returns `warnings`, tell the user and use the option each one names.
@@ -95,8 +109,10 @@ If the posting is blocked (`job_url_blocked`), ask the user to paste the job tex
    expire after 10 minutes, so call `get_generation` again for fresh ones.
    - Always relay `warnings` as a short "check before sending" list. They don't block the download.
    - If you cannot open the PDFs, call `get_pack_text(job_id)` (and `artifact="cover"` when needed)
-     or `get_pack_preview(job_id, page=1, format="html"|"text"|"png")` and verify before telling the
-     user the pack is good.
+     or `get_pack_preview(job_id, page=1, format="png")` and open the returned `preview_url` (not
+     inline base64). `get_pack_text` omits packer-hidden DOM. Edits require a Full Access key with
+     Generated-document edits enabled. Only change blocks with
+     `in_pdf=true` from `get_pack_source`; use each `preview_url` page before `commit_pack_edit`.
    - If there are `bullet_rewrites`, show two or three of the best (original, then new) and offer
      to keep any as the profile wording with `save_bullet_rewrite`. Save only the ones the user
      picks.
@@ -163,9 +179,10 @@ If the tools return `feature_off`, TailrMe isn't enabled for this account yet; s
 
 ## Profile upkeep
 
-- New facts from the conversation (a new achievement, changed salary expectation, new target city):
-  offer to save them. Short notes go in with `add_brief_chunk` (free); messy notes through
-  `organise_brief` (0.1). For salary, always include a currency (USD, INR, GBP, …) before saving.
+- New preferences from the conversation (changed salary expectation, target city, notice or a red
+  line) go to `add_brief_chunk` (free); messy preference notes use `organise_brief` (0.1). New facts
+  (an achievement, project, story or metric) go to `add_context_vault_entry` and can be read with
+  `get_context_vault`. For salary, always include a currency (USD, INR, GBP, …) before saving.
 - Fix resume content with `update_component_item`, `replace_role_bullets`, `save_bullet_rewrite` or
   `update_master_section`.
 - Default bullet style for every pack: `update_tone(fields={"bullets": "xyz"})` (or `car`, `ao`,
@@ -175,7 +192,17 @@ If the tools return `feature_off`, TailrMe isn't enabled for this account yet; s
   Paragraphs set to Preferred are tuned to each job from saved facts only. The sign-off line
   ("Best regards," and so on) is `update_cover_letter(section="closing", signoff=...)`.
 - Template colours set with `set_colors` apply to that template's resume and cover letter.
-- Logic rules (name prefix, photo, location framing, headline tag, layout density, keyed to the
-  job's region, work mode, employment type or seniority) are edited in CoTailr's Logic page; there
-  is no connector tool for them yet.
+- Logic rules (name prefix, name suffix, photo, location framing, headline tag, layout density,
+  keyed to region, work mode, employment type or seniority) live on CoTailr's Logic page. With Full
+  Access and the Logic changes permission, use `preview_logic_change` then `apply_logic_change`
+  (revision-bound; Undo via the returned `change_id`). Contact stores prefix/suffix values; matching
+  rules decide when they appear.
+- Brief (`get_brief` / `add_brief_chunk`) is private preferences only (salary, notice, locations,
+  red lines) — never printable. Context Vault (`get_context_vault` /
+  `add_context_vault_entry`) holds factual `background` / `evidence` (stories, projects, metrics).
+  The Brief tools cannot read or change Vault entries, and Vault tools cannot change Brief entries.
+  Only verified, normal-sensitivity evidence can print. Promote with
+  `preview_context_promotion` → `apply_context_promotion` when Context changes are allowed.
+- Call `list_capabilities` to see every tool plus access, credit rule, policy gates, revision and
+  Undo metadata for this key.
 - Contact changes need `update_contact` twice: preview, then `confirm=true` after the user agrees.
