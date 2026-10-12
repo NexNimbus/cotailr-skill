@@ -5,16 +5,18 @@ The CoTailr connector is a remote [Model Context Protocol](https://modelcontextp
 - **URL:** `https://mcp.cotailr.com/mcp` (Streamable HTTP, stateless, JSON responses)
 - **Auth:** `Authorization: Bearer <access key>` (or `X-API-Key: <access key>`). Keys come from
   [Settings → Connected apps](https://cotailr.com/settings#connected-apps).
-- **Access levels:** **Generate only** keys see the 8 tools marked **G**. **Full access** keys see all 53.
+- **Access levels:** **Generate only** keys see the tools marked **G** (includes `prepare_generation` and
+  `get_pack_preview`). **Full access** keys see every tool.
 - **Credits:** charged tools use the account's normal CoTailr credits. Connected apps can spend at most
   **15 credits per day** (resets 00:00 UTC). Plan features still apply, so Job Fit needs Plus or Pro.
   `credits_charged: 0` means that call was not billed (unlimited / super-admin accounts); listed costs
   still apply on normal Free / Plus / Pro plans.
-- **Undo:** every write is snapshotted. `undo_last_change(area)` restores the previous state, and the CoTailr web
-  app shows a *Changed by &lt;app&gt;* marker with an Undo button.
-- **Errors:** `{"error": code, "message": "...", "retry_with"?: field}`. Codes include `job_url_blocked`,
-  `no_credits`, `plan_gate`, `daily_credit_limit_reached`, `rate_limited`, `bad_input`, `not_found` and
-  `not_ready`.
+- **Undo:** every write is its own snapshot. `undo_last_change(area)` or `undo_change(change_id)` restores
+  that write; the CoTailr web app shows a *Changed by &lt;app&gt;* marker with an Undo button.
+- **Errors:** `{"error": code, "message": "...", "retry_with"?: field}` and, for schema mismatches,
+  structured `{field, expected, example, next_call}`. Codes include `job_url_blocked`, `no_credits`,
+  `plan_gate`, `daily_credit_limit_reached`, `rate_limited`, `bad_input`, `needs_confirmation`,
+  `not_found` and `not_ready`.
 
 The server also sends usage instructions to the AI app when it connects, and offers four one-click
 **prompts** (workflows): *Apply to a job*, *Review my tracker*, *Answer application questions* and *Check my
@@ -26,12 +28,14 @@ profile*.
 
 | Tool | Access | Credits | What it does |
 |---|---|---|---|
-| `fetch_job(job_url)` | G | Free | Reads a job posting: company, role, location and a text preview. Sets `likely_closed` when the page looks removed or 404 — warn and do not generate until the user confirms. |
-| `generate_resume(job_url \| job_text, template?, size?, special_instructions?, company?, role?, tone?, hide_fields?)` | G | 1 | Starts a tailored resume and cover letter pack. `size`: auto, snapshot, professional, portfolio, dossier. `tone`: AI Tone for this pack only (pass `match.tone_fit.suggested.tone` from `match_job` to use the suggestion; omit for the user's own tone). `tone.bullets` sets the experience bullet style for this pack: `off` (CoTailr Style), `auto`, `xyz`, `car` or `ao`. `hide_fields`: personal details to leave off this pack only, any of `dob`, `gender`, `nationality`, `location`, `onsite`, `phone` (the profile is not changed). Returns `job_id` and `warnings` for instructions CoTailr can't follow (each says which option does it). The finished pack is added to the tracker as *Ready to apply*. |
-| `get_generation(job_id)` | G | Free | Status. When done, gives download links (valid for 10 minutes) and the tracker `application_id`. Also returns `warnings` (things to check before sending: a hidden detail still printed, a rewrite that kept the original wording because it added or dropped a fact, a cut-off line, too many pages, a section dropped to fit) and, when a bullet style was used, `bullet_style` and `bullet_rewrites` (`[{id, source, text}]`). Warnings never block the download. |
-| `get_pack_text(job_id, artifact?)` | G | Free | Plain text of the finished `resume` (default) or `cover`. Use when PDF links are blocked so you can still verify the pack. |
-| `list_templates()` | G | Free | Template families available to the user, and which are active. Each family has a `tagline`, `best_for`, `avoid_if`, `ats_friendliness` (high or medium) with `ats_note`, `layout` (columns, photo, look) and `sizes` (what each size contains). Use it to recommend a template for the job. |
-| `get_usage()` | G | Free | Credits left, plan, and today's connected-app spend against the daily cap. Explains when `credits_charged` can be 0. |
+| `fetch_job(job_url)` | G | Free | Reads a job posting: company, role, location, full job text (capped) and a short `preview`. Sets `likely_closed` when the page looks removed or 404 — warn and do not generate until the user confirms. |
+| `prepare_generation(job_url \| job_text, …)` | G | Free | Preflight before charging: resolved template/size, `accepted_sizes` / aliases, duplicate Tracker candidates, identity preview, section/tone hints, `preflight_id` (about 15 minutes). Pass that id into `generate_resume`. |
+| `generate_resume(job_url \| job_text, template?, size?, …)` | G | 1 | Starts a tailored resume and cover letter pack. Prefer `preflight_id`. `size`: auto, snapshot, professional, portfolio, dossier — unsupported pairs are rejected before charge unless an explicit alias applies. With pasted `job_text`, pass `source_url` to keep the job link. Pass `application_id` to regenerate into an existing Tracker row, or `create_new=true` for a second row. `hide_fields`: `dob`, `gender`, `nationality`, `location`, `relocation`, `onsite`, `phone`. Optional `region_override` / `name_prefix_override`. Returns `job_id` and `warnings`. |
+| `get_generation(job_id)` | G | Free | Status (progress may include an ETA band). When done, download links (10 minutes) and `application_id`, plus `warnings` / `bullet_rewrites` when relevant. |
+| `get_pack_text(job_id, artifact?)` | G | Free | Plain text of the finished `resume` (default) or `cover`. |
+| `get_pack_preview(job_id, artifact?, page?, format?)` | G | Free | One page of the saved pack: `html`, `text`, or `png` (from the saved PDF when `pdftoppm` is available). |
+| `list_templates()` | G | Free | Active template families with `tagline`, `best_for`, `avoid_if`, `ats_friendliness`, `layout`, `sizes`, plus `accepted_sizes`, `aliases`, and `unsupported_behavior`. |
+| `get_usage()` | G | Free | Credits left, plan, and today's connected-app spend against the daily cap. |
 
 ## Tracker
 
@@ -39,9 +43,12 @@ profile*.
 |---|---|---|---|
 | `list_applications(query?, status?, limit?, compact?)` | G | Free | Searches the tracker, newest first (up to 100 rows plus counts by status). `compact` defaults to true (short rows); pass `false` for notes and full location fields. |
 | `get_application(application_id)` | G | Free | One application with fit scores and notes. |
-| `create_application(company, role, ...)` | Full | Free | Adds a job by hand. |
+| `create_application(company, role, ...)` | Full | Free | Adds a job by hand (not needed after `generate_resume`). |
 | `update_application(application_id, fields)` | Full | Free | Changes status, notes, dates, company, role or link. Moving *Ready to apply* to *Applied* sets the applied date to today. |
 | `delete_application(application_id)` | Full | Free | Deletes an application (undoable). |
+| `find_application_duplicates(company?, role?, limit?)` | Full | Free | Tracker rows that look like the same company+role. |
+| `bulk_update_applications(application_ids, fields)` | Full | Free | Same field update on many rows; returns per-row results and `change_id`. |
+| `bulk_delete_applications(application_ids, dry_run?, confirm?)` | Full | Free | Preview with `dry_run=true` (default); delete with `dry_run=false` and `confirm=true`. |
 
 **Statuses:** `draft` (*Ready to apply*), `applied`, `in_progress`, `interview_1`, `interview_2`, `interview_3`,
 `offer`, `got_the_job`, `rejected_no_interview`, `rejected`, `withdrawn`.
@@ -51,13 +58,13 @@ profile*.
 | Tool | Access | Credits | What it does |
 |---|---|---|---|
 | `get_master()` | Full | Free | The organised master resume (Markdown) and its headings. |
-| `update_master_section(heading, text)` | Full | Free | Replaces one section of the master resume. |
+| `update_master_section(heading, text, dry_run?, confirm_token?)` | Full | Free | Default `dry_run=true` returns a preview and `confirm_token`; apply with `dry_run=false` and that token. |
 | `upload_master(text)` | Full | Free | Saves new raw resume text. |
 | `parse_master()` | Full | 1 | Organises the raw resume with CoTailr AI. |
 | `sync_master_from_components(apply?, item_ids?)` | Full | Free preview / 0.5 | Finds Resume Component items missing from the master, and merges them if `apply=true`. |
 | `get_components(section?)` | Full | Free | Structured Resume Components. |
 | `update_component_item(section, item_id, fields, parent_id?)` | Full | Free | Edits one item. |
-| `add_component_item(section, item, ...)` | Full | Free | Adds an item. |
+| `add_component_item(section, item, …, allow_duplicate?)` | Full | Free | Adds an item. Similar items require `allow_duplicate=true`. |
 | `remove_component_item(section, item_id, parent_id?)` | Full | Free | Removes an item. |
 | `reorder_items(section, ordered_ids, ...)` | Full | Free | Reorders a list. |
 | `replace_role_bullets(role_id, section_id, bullets)` | Full | Free | Rewrites the bullets of one role. |
@@ -107,8 +114,10 @@ account (`feature_off` otherwise).
 | `generate_cover_letter(section, current?, save?)` | Full | 0.2 | Drafts a cover-letter block: opening, differentiator, closing or achievements. |
 | `get_cover_letter(job_id)` / `edit_cover_letter(job_id, html)` | Full | Free | Reads or edits a generated cover letter and re-renders its PDF. |
 
-## Undo
+## Logic and undo
 
 | Tool | Access | Credits | What it does |
 |---|---|---|---|
-| `undo_last_change(area, confirm?)` | Full | Free | Reverts the latest connected-app change in `templates`, `tracker`, `components`, `master`, `contact`, `brief`, `tone`, `cover_letter` or `tailrme`. Asks for confirmation if the user has edited since. |
+| `get_logic_rules()` | Full | Free | Region / name-prefix Logic pack (read). One-pack overrides use `region_override` / `name_prefix_override` on generate. |
+| `undo_last_change(area, confirm?)` | Full | Free | Reverts the latest connected-app change in `templates`, `tracker`, `components`, `master`, `contact`, `brief`, `tone`, `cover_letter` or `tailrme`. |
+| `undo_change(change_id, confirm?)` | Full | Free | Reverts one write by `change_id` from a write response. |

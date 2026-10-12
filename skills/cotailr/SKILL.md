@@ -71,36 +71,45 @@ If the posting is blocked (`job_url_blocked`), ask the user to paste the job tex
 1. Confirm template and size. Ask once, briefly.
    - Template: `list_templates` and offer the user's active ones. Recommend one in a line using its
      `best_for`, `avoid_if` and `ats_friendliness`: `high` for online portals (Workday, Greenhouse,
-     Taleo) and conservative employers, a design-led one when a person reads it first.
+     Taleo) and conservative employers, a design-led one when a person reads it first. Use each
+     family's `accepted_sizes` / `aliases`; unsupported size+template pairs are rejected before
+     charging (aliases are stated in warnings, never silent).
    - Size: `auto` unless they want snapshot, professional, portfolio or dossier.
-2. `generate_resume`. Use the real options, not `special_instructions`, for what they cover:
+2. Free preflight (recommended): `prepare_generation` with the same job URL or `job_text`. It returns
+   `preflight_id`, resolved template/size, duplicate Tracker candidates, and warnings. Pass
+   `preflight_id` into `generate_resume`. With pasted text, pass `source_url` so the Tracker keeps
+   the original link. If a similar row already exists, pass `application_id` to regenerate into it,
+   or `create_new=true` only when the user wants a second row.
+3. `generate_resume`. Use the real options, not `special_instructions`, for what they cover:
    - Leaving a personal detail off this resume (date of birth, gender, nationality, location,
-     onsite preference, phone): `hide_fields`. The profile stays unchanged.
+     relocation, onsite preference, phone): `hide_fields`. The profile stays unchanged.
    - Bullet structure ("XYZ", "CAR", "STAR", "shorter bullets"): `tone={"bullets": ...}` with `xyz`,
      `car`, `ao` (short action + outcome) or `auto`. `off` is CoTailr Style, the default light
      tailoring. Bullet styles only reshape Preferred and Flexible bullets from their own facts;
      Locked bullets never change.
+   - Optional one-pack overrides: `region_override`, `name_prefix_override` (see `get_logic_rules`).
    - Only pass `special_instructions` for something the profile can't know, in one sentence (for
      example "lead with the Salesforce migration"). CoTailr already applies the Brief and tone.
    If `generate_resume` returns `warnings`, tell the user and use the option each one names.
-3. Poll `get_generation` every ~30 seconds until done (usually 1-3 minutes). Share the links; they
+4. Poll `get_generation` every ~30 seconds until done (usually 1-3 minutes). Share the links; they
    expire after 10 minutes, so call `get_generation` again for fresh ones.
    - Always relay `warnings` as a short "check before sending" list. They don't block the download.
    - If you cannot open the PDFs, call `get_pack_text(job_id)` (and `artifact="cover"` when needed)
-     and skim the text before telling the user the pack is good.
+     or `get_pack_preview(job_id, page=1, format="html"|"text"|"png")` and verify before telling the
+     user the pack is good.
    - If there are `bullet_rewrites`, show two or three of the best (original, then new) and offer
      to keep any as the profile wording with `save_bullet_rewrite`. Save only the ones the user
      picks.
-4. The pack is tracked as "Ready to apply" (status `draft`). For Ashby jobs (`jobs.ashbyhq.com`)
+5. The pack is tracked as "Ready to apply" (status `draft`). For Ashby jobs (`jobs.ashbyhq.com`)
    on a desktop browser, suggest **Apply with CoTailr**: the button in CoTailr's Tracker or Generate
    page opens the form and the CoTailr Fill bookmark fills it (resume, cover letter, screening
    answers; 0.3 credits). The user reviews and submits, and CoTailr marks the job applied when
    Ashby confirms. You can't run it from the chat.
-5. When the user says they've submitted, check `get_application` first; Apply with CoTailr may have
+6. When the user says they've submitted, check `get_application` first; Apply with CoTailr may have
    marked it already. Otherwise `update_application(status="applied")`.
 
-Each generation adds a tracker entry. Don't call `create_application` for it. If the user generated
-twice for the same job, offer to delete the older entry.
+Don't call `create_application` for a job you just generated. Prefer `application_id` on regenerate;
+only create a second Tracker row when the user asks (`create_new=true`).
 
 ## Application forms and screening questions
 
