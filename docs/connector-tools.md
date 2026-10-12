@@ -24,11 +24,25 @@ profile*.
 
 ---
 
+## Job Search (provider catalogue)
+
+Himalayas.app is the first provider. The user enables it in CoTailr → **Job Search**; the same flag
+gates these tools. Agents must not call Himalayas directly.
+
+| Tool | Access | Credits | What it does |
+|---|---|---|---|
+| `list_job_integrations()` | G | Free | Enabled/available job sources for this user (e.g. Himalayas). |
+| `search_jobs(query?, country?, seniority?, employment_type?, sort?, …)` | G | Free | Search enabled providers via CoTailr (cached). Returns eligibility labels and attribution. |
+| `get_job_listing(job_id)` | G | Free | Full normalized listing (description, meta, source URL). |
+| `get_job_handoff(job_id)` | G | Free | Prefill payload for Generate (`jd_text`, `jd_url` / source URL, company, role, …). |
+| `save_job(job_id)` / `dismiss_job(job_id)` | Full | Free | Shortlist or hide a listing for this user. |
+| `list_saved_jobs()` | G | Free | Saved shortlist. |
+
 ## Jobs and generation
 
 | Tool | Access | Credits | What it does |
 |---|---|---|---|
-| `fetch_job(job_url)` | G | Free | Reads a job posting: company, role, location, full job text (capped) and a short `preview`. Sets `likely_closed` when the page looks removed or 404 — warn and do not generate until the user confirms. |
+| `fetch_job(job_url)` | G | Free | Reads a job posting: company, role, location, full job text (capped) and a short `preview`. Sets `likely_closed` when the page looks removed or 404 — warn and do not generate until the user confirms. Himalayas listing URLs are supported. |
 | `prepare_generation(job_url \| job_text, …)` | G | Free | Preflight before charging: resolved template/size, `accepted_sizes` / aliases, duplicate Tracker candidates, identity preview, section/tone hints, `preflight_id` (about 15 minutes). Pass that id into `generate_resume`. |
 | `generate_resume(job_url \| job_text, template?, size?, …)` | G | 1 | Starts a tailored resume and cover letter pack. Prefer `preflight_id`. `size`: auto, snapshot, professional, portfolio, dossier — unsupported pairs are rejected before charge unless an explicit alias applies. With pasted `job_text`, pass `source_url` to keep the job link. Pass `application_id` to regenerate into an existing Tracker row, or `create_new=true` for a second row. `hide_fields`: `dob`, `gender`, `nationality`, `location`, `relocation`, `onsite`, `phone`. Optional `region_override` / `name_prefix_override`. Returns `job_id` and `warnings`. |
 | `get_generation(job_id)` | G | Free | Status (progress may include an ETA band). When done, download links (10 minutes) and `application_id`, plus `warnings` / `bullet_rewrites` when relevant. |
